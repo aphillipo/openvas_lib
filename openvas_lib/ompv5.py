@@ -136,8 +136,6 @@ class OMPv5(OMP):
             <target id="%s"/>
             </create_task>""" % (name, comment, config, target)
 
-        print(request)
-
         return self._manager.make_xml_request(request, xml_result=True).get("id")
 
     # ----------------------------------------------------------------------
@@ -167,8 +165,7 @@ class OMPv5(OMP):
         """
         targets = hosts
         if isinstance(hosts, Iterable):
-            targets = [h for h in hosts if h]
-            targets = ",".join(targets)
+            targets = ",".join(hosts)
 
         request = """<create_target>
             <name>%s</name>
@@ -217,14 +214,12 @@ class OMPv5(OMP):
                         <port_range>%s</port_range>
                      </create_port_list>""" % (name, ports,)
 
-        print request
-
         return self._manager.make_xml_request(request, xml_result=True).get("id")
 
     # ----------------------------------------------------------------------
     def make_port_list(self, ports, protocol='tcp'):
         prefix = 'T:' if protocol is 'tcp' else 'U:'
-        ports = [prefix + pr for pr in port_ranges(ports)]
+        ports = [prefix+pr for pr in port_ranges(ports)]
         return ','.join(ports)
 
     # ----------------------------------------------------------------------
@@ -380,7 +375,7 @@ class OMPv5(OMP):
 
         :raises: ClientError, ServerError
         """
-        if not isinstance(task_id, basestring):
+        if not isinstance(task_id, str):
             raise TypeError("Expected string, got %r instead" % type(task_id))
 
         status = self.get_tasks().find('.//task[@id="%s"]/status' % task_id)
@@ -403,7 +398,7 @@ class OMPv5(OMP):
 
         :raises: ClientError, ServerError
         """
-        if not isinstance(task_id, basestring):
+        if not isinstance(task_id, str):
             raise TypeError("Expected string, got %r instead" % type(task_id))
 
         m_sum_progress = 0.0  # Partial progress
@@ -481,12 +476,12 @@ class OMPv5(OMP):
 
     #----------------------------------------------------------------------
     def get_tasks_detail(self, scan_id):
-        if not isinstance(scan_id, basestring):
+        if not isinstance(scan_id, str):
             raise TypeError("Expected string, got %r instead" % type(scan_id))
 
         try:
             m_response = self._manager.make_xml_request('<get_tasks task_id="%s" details="1"/>' % scan_id, xml_result=True)
-        except ServerError, e:
+        except ServerError as e:
             raise VulnscanServerError("Can't get the detail for the task %s. Error: %s" % (scan_id, e.message))
         return m_response
 
@@ -497,34 +492,34 @@ class OMPv5(OMP):
 
     #----------------------------------------------------------------------
     def get_report_pdf(self, report_id):
-        if not isinstance(report_id, basestring):
+        if not isinstance(report_id, str):
             raise TypeError("Expected string, got %r instead" % type(report_id))
 
         try:
             m_response = self._manager.make_xml_request('<get_reports report_id="%s" format_id="c402cc3e-b531-11e1-9163-406186ea4fc5"/>' % report_id, xml_result=True)
-        except ServerError, e:
+        except ServerError as e:
             raise VulnscanServerError("Can't get the pdf for the report %s. Error: %s" % (report_id, e.message))
         return m_response
 
     #----------------------------------------------------------------------
     def get_report_html(self, report_id):
-        if not isinstance(report_id,basestring):
+        if not isinstance(report_id, str):
             raise TypeError("Expected string, got %r instead" % type(report_id))
 
         try:
             m_response = self._manager.make_xml_request('<get_reports report_id="%s" format_id="6c248850-1f62-11e1-b082-406186ea4fc5"/>' % report_id, xml_result=True)
-        except ServerError, e:
+        except ServerError as e:
             raise VulnscanServerError("Can't get the pdf for the report %s. Error: %s" % (report_id, e.message))
         return m_response
 
     #----------------------------------------------------------------------
     def get_report_xml(self, report_id):
-        if not isinstance(report_id, basestring):
+        if not isinstance(report_id, str):
             raise TypeError("Expected string, got %r instead" % type(report_id))
 
         try:
             m_response = self._manager.make_xml_request('<get_reports report_id="%s" />' % report_id, xml_result=True)
-        except ServerError, e:
+        except ServerError as e:
             raise VulnscanServerError("Can't get the xml for the report%s. Error: %s" % (report_id, e.message))
 
         return m_response
@@ -539,7 +534,7 @@ class OMPv5(OMP):
 
         :raises: ClientError, ServerError
         """
-        if not isinstance(task_id, basestring):
+        if not isinstance(task_id, str):
             raise TypeError("Expected string, got %r instead" % type(task_id))
 
         m_query = '<start_task task_id="%s"/>' % task_id
